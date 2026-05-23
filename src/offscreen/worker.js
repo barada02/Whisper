@@ -30,6 +30,7 @@ async function getPipeline(forceWasm) {
   try {
     transcriber = await pipeline('automatic-speech-recognition', 'onnx-community/moonshine-tiny-ONNX', {
       device: targetDevice,
+      dtype: 'fp32',
       progress_callback: (data) => {
         // Send loading progress back to offscreen main thread
         if (data.status === 'progress') {
