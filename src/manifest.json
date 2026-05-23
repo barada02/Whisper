@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Whisper STT - Moonshine Dictation",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Premium, continuous on-device local Speech-to-Text using Moonshine Tiny and WebGPU.",
   "permissions": [
     "activeTab",
@@ -9,12 +9,7 @@
     "storage"
   ],
   "action": {
-    "default_icon": {
-      "16": "icons/icon16_inactive.png",
-      "32": "icons/icon32_inactive.png",
-      "48": "icons/icon48_inactive.png",
-      "128": "icons/icon128_inactive.png"
-    },
+    "default_icon": "icons/icon32_inactive.png",
     "default_title": "Activate Voice Dictation"
   },
   "background": {
@@ -23,8 +18,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["content/content.js"],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content/content.js"
+      ],
       "run_at": "document_end"
     }
   ],
@@ -36,7 +36,9 @@
         "transformers/*.mjs",
         "content/content.css"
       ],
-      "matches": ["<all_urls>"]
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ]
 }

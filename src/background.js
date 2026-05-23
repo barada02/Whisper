@@ -43,18 +43,13 @@ async function closeOffscreenDocument() {
 // Update Extension Icon representation
 async function updateExtensionUI(tabId) {
   const state = isDictationActive ? 'active' : 'inactive';
-  const title = isDictationActive 
-    ? 'Whisper STT - Continuous Dictation Active (Click to Stop)' 
+  const title = isDictationActive
+    ? 'Whisper STT - Continuous Dictation Active (Click to Stop)'
     : 'Whisper STT - Activate Continuous Dictation';
 
-  // Set action icon
+  // Set action icon (passing a single path string allows Chrome to auto-scale and avoids strict dimension checks)
   await chrome.action.setIcon({
-    path: {
-      "16": `icons/icon16_${state}.png`,
-      "32": `icons/icon32_${state}.png`,
-      "48": `icons/icon48_${state}.png`,
-      "128": `icons/icon128_${state}.png`
-    },
+    path: `icons/icon32_${state}.png`,
     tabId: tabId
   });
 
@@ -66,8 +61,13 @@ async function updateExtensionUI(tabId) {
 
 // Toggle Dictation Session On/Off
 async function toggleDictation(tab) {
-  if (!tab || !tab.id || tab.url.startsWith('chrome://')) {
-    console.warn('Dictation cannot run on this page.');
+  const isRestrictedUrl = tab.url && (
+    tab.url.startsWith('chrome://') ||
+    tab.url.startsWith('chrome-extension://')
+  );
+
+  if (!tab || !tab.id || isRestrictedUrl) {
+    console.warn('Dictation cannot run on browser internal or extension utility pages.');
     return;
   }
 
