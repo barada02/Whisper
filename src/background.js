@@ -134,6 +134,7 @@ async function handleBackgroundMessages(message, sender, sendResponse) {
     case 'SPEECH_COMMIT':
     case 'SPEECH_SILENCE':
     case 'MODEL_STATUS':
+      // Forward to content script on active tab
       try {
         await chrome.tabs.sendMessage(activeTab.id, {
           target: 'content',
@@ -144,6 +145,14 @@ async function handleBackgroundMessages(message, sender, sendResponse) {
         if (!handleBackgroundMessages._contentWarnLogged) {
           console.warn('Content script not available on this tab. Speech events will be forwarded once a compatible page is active.');
           handleBackgroundMessages._contentWarnLogged = true;
+        }
+      }
+      // Also broadcast MODEL_STATUS via runtime so the options/setup page can receive it
+      if (message.type === 'MODEL_STATUS') {
+        try {
+          chrome.runtime.sendMessage({ ...message });
+        } catch (e) {
+          // Options page may not be open — ignore
         }
       }
       break;
@@ -190,5 +199,14 @@ async function handleBackgroundMessages(message, sender, sendResponse) {
 chrome.runtime.onSuspend.addListener(async () => {
   if (isDictationActive) {
     await closeOffscreenDocument();
+  }
+});
+
+// Auto-open Setup page on first install
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    chrome.tabs.create({
+      url: chrome.runtime.getURL('options/options.html')
+    });
   }
 });

@@ -2,39 +2,177 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Whisper STT - Onboarding & Settings</title>
+    <title>Whisper STT - Setup & Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="options.css">
   </head>
   <body>
     <div class="glow-bg"></div>
     <div class="container">
+
+      <!-- Header -->
       <header class="header">
+        <div class="logo-mark">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <defs>
+              <linearGradient id="logo-grad" x1="0" y1="0" x2="48" y2="48">
+                <stop offset="0%" stop-color="#a55eea"/>
+                <stop offset="50%" stop-color="#6c5ce7"/>
+                <stop offset="100%" stop-color="#00e676"/>
+              </linearGradient>
+            </defs>
+            <circle cx="24" cy="24" r="23" stroke="url(#logo-grad)" stroke-width="2" fill="none" opacity="0.3"/>
+            <path d="M24 10C20.7 10 18 12.7 18 16V24C18 27.3 20.7 30 24 30C27.3 30 30 27.3 30 24V16C30 12.7 27.3 10 24 10Z" fill="url(#logo-grad)" opacity="0.85"/>
+            <path d="M14 22V24C14 29.5 18.5 34 24 34C29.5 34 34 29.5 34 24V22" stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <line x1="24" y1="34" x2="24" y2="39" stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="19" y1="39" x2="29" y2="39" stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
         <h1 class="title">Whisper STT</h1>
         <p class="subtitle">On-Device Local Dictation Powered by Moonshine Tiny</p>
       </header>
 
-      <div class="card glass">
-        <h2>🚀 Getting Started</h2>
-        <div class="steps">
-          <div class="step">
-            <div class="step-num">1</div>
-            <div class="step-content">
-              <h3>Pin the Extension</h3>
-              <p>Click the Extensions puzzle icon <span class="badge">🧩</span> at the top-right of your browser and pin <strong>Whisper STT</strong> for instant toggling.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">2</div>
-            <div class="step-content">
-              <h3>Grant Microphone Access</h3>
-              <p>We process all voice records 100% locally on your computer. Enable microphone access below to start.</p>
-              <button id="mic-btn" class="btn">Grant Microphone Permission</button>
-              <div id="mic-status" class="status-msg hidden">
-                <span class="icon-check">✓</span> Permission Granted successfully!
-              </div>
-            </div>
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- WIZARD STEP INDICATOR -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="wizard-progress">
+        <div class="wizard-step active" data-step="1">
+          <div class="wizard-dot"><span>1</span></div>
+          <span class="wizard-label">Microphone</span>
+        </div>
+        <div class="wizard-line" id="line-1-2"></div>
+        <div class="wizard-step" data-step="2">
+          <div class="wizard-dot"><span>2</span></div>
+          <span class="wizard-label">Model</span>
+        </div>
+        <div class="wizard-line" id="line-2-3"></div>
+        <div class="wizard-step" data-step="3">
+          <div class="wizard-dot"><span>3</span></div>
+          <span class="wizard-label">Ready</span>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- STEP 1: Microphone Permission -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="wizard-card card glass" id="step-1">
+        <div class="step-icon">🎙️</div>
+        <h2>Grant Microphone Access</h2>
+        <p class="step-desc">
+          Whisper STT processes all audio <strong>100% locally</strong> on your device. 
+          Your voice never leaves your computer. We need microphone access to capture 
+          audio for on-device speech recognition.
+        </p>
+        <div class="step-action">
+          <button id="mic-btn" class="btn btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M12 1C10.34 1 9 2.34 9 4V12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12V4C15 2.34 13.66 1 12 1Z"/>
+              <path d="M19 10V12C19 15.87 15.87 19 12 19C8.13 19 5 15.87 5 12V10"/>
+              <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+            Grant Microphone Permission
+          </button>
+          <div id="mic-status" class="status-badge hidden">
+            <span class="status-check">✓</span> Permission Granted
           </div>
         </div>
+        <div class="step-nav">
+          <button id="step1-next" class="btn btn-next" disabled>
+            Continue
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12H19M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- STEP 2: Model Download -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="wizard-card card glass hidden" id="step-2">
+        <div class="step-icon">📦</div>
+        <h2>Download Speech Model</h2>
+        <p class="step-desc">
+          Downloading <strong>Moonshine Tiny</strong> (~50MB) from Hugging Face. 
+          This is a one-time download — the model is cached locally in your browser for 
+          offline use. All inference runs entirely on your device using WebGPU.
+        </p>
+        <div class="download-panel">
+          <div class="download-info">
+            <div class="download-header">
+              <span class="download-name">onnx-community/moonshine-tiny-ONNX</span>
+              <span id="download-percent" class="download-pct">0%</span>
+            </div>
+            <div class="progress-bar-wrapper">
+              <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <span id="progress-text" class="progress-text">Waiting to start...</span>
+          </div>
+        </div>
+        <div id="download-status" class="status-badge hidden">
+          <span class="status-check">✓</span> Model Cached Successfully — Offline Ready
+        </div>
+        <div class="step-nav">
+          <button id="step2-next" class="btn btn-next" disabled>
+            Continue
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12H19M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- STEP 3: Ready! -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="wizard-card card glass hidden" id="step-3">
+        <div class="step-icon step-icon-ready">🎉</div>
+        <h2>You're All Set!</h2>
+        <p class="step-desc">
+          Whisper STT is ready to use. Navigate to any website, click the extension icon 
+          in your toolbar, and start speaking. Your dictated text will be typed into 
+          whichever text field is focused.
+        </p>
+        <div class="ready-instructions">
+          <div class="instruction-row">
+            <div class="instruction-num">1</div>
+            <p>Pin the extension using the <span class="badge">🧩</span> puzzle icon in your toolbar</p>
+          </div>
+          <div class="instruction-row">
+            <div class="instruction-num">2</div>
+            <p>Navigate to any website and click on a text field</p>
+          </div>
+          <div class="instruction-row">
+            <div class="instruction-num">3</div>
+            <p>Click the <strong>Whisper STT</strong> icon to start dictation</p>
+          </div>
+        </div>
+        <div class="step-action">
+          <button id="test-mic-btn" class="btn btn-lg btn-test">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.08"/>
+            </svg>
+            Test Microphone
+          </button>
+        </div>
+        <div id="test-result" class="test-panel hidden">
+          <div class="test-visualizer">
+            <canvas id="test-canvas" width="400" height="50"></canvas>
+          </div>
+          <p id="test-status" class="test-status">Listening...</p>
+        </div>
+        <div id="setup-complete-badge" class="completion-badge hidden">
+          <div class="completion-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <p>Setup Complete — Whisper STT is ready for dictation!</p>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- SETTINGS (always visible below wizard) -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="settings-divider">
+        <span>Advanced Settings</span>
       </div>
 
       <div class="card glass">
@@ -76,22 +214,6 @@
         <div class="save-bar">
           <button id="save-btn" class="btn btn-save">Save Settings</button>
           <span id="save-status" class="save-status hidden">Settings saved!</span>
-        </div>
-      </div>
-
-      <div class="card glass">
-        <h2>📦 Offline Model Pre-caching</h2>
-        <div class="caching-section">
-          <div class="caching-info">
-            <h3>Moonshine Tiny (50MB)</h3>
-            <p>The model downloads automatically. It is saved directly in your browser's persistent cache. We will begin caching immediately to ensure offline readiness.</p>
-          </div>
-          <div class="progress-container">
-            <div class="progress-bar-wrapper">
-              <div id="progress-fill" class="progress-fill"></div>
-            </div>
-            <span id="progress-text" class="progress-text">Model Ready (Pre-cached)</span>
-          </div>
         </div>
       </div>
       
