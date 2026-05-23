@@ -140,7 +140,11 @@ async function handleBackgroundMessages(message, sender, sendResponse) {
           ...message
         });
       } catch (e) {
-        console.warn('Failed to forward speech message to content script:', e);
+        // Only log once to avoid console spam when content script isn't loaded
+        if (!handleBackgroundMessages._contentWarnLogged) {
+          console.warn('Content script not available on this tab. Speech events will be forwarded once a compatible page is active.');
+          handleBackgroundMessages._contentWarnLogged = true;
+        }
       }
       break;
 

@@ -84,7 +84,9 @@ async function startRecording() {
     console.log(`Microphone captured successfully. Input Sample Rate: ${inputSampleRate}Hz`);
 
     // Register the AudioWorklet processor module
-    await audioContext.audioWorklet.addModule('offscreen/audio-processor.js');
+    // Use absolute extension URL since offscreen.html is inside offscreen/ subdirectory
+    const processorUrl = chrome.runtime.getURL('offscreen/audio-processor.js');
+    await audioContext.audioWorklet.addModule(processorUrl);
 
     // Create AudioWorkletNode connected to our processor
     workletNode = new AudioWorkletNode(audioContext, 'audio-capture-processor');
