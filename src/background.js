@@ -14,7 +14,7 @@ async function ensureOffscreenDocument() {
   try {
     await chrome.offscreen.createDocument({
       url: OFFSCREEN_PATH,
-      reasons: ['AUDIO_CAPTURE'],
+      reasons: ['USER_MEDIA'],
       justification: 'Capture user microphone stream for local automatic speech recognition (ASR)'
     });
     console.log('Offscreen document created successfully.');
