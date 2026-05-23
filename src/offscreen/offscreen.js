@@ -17,20 +17,7 @@ let transcriptionInterval = null;
 let RMS_THRESHOLD = 0.015; // default energy threshold
 let SILENCE_DURATION_MS = 1500; // 1.5 seconds pause commits speech
 
-// Load settings from storage
-chrome.storage.local.get(['rmsThreshold', 'silenceDuration', 'forceWasm'], (settings) => {
-  if (settings.rmsThreshold !== undefined) {
-    RMS_THRESHOLD = parseFloat(settings.rmsThreshold);
-  }
-  if (settings.silenceDuration !== undefined) {
-    SILENCE_DURATION_MS = parseInt(settings.silenceDuration);
-  }
-  console.log(`Initialized VAD: Threshold=${RMS_THRESHOLD}, SilenceMs=${SILENCE_DURATION_MS}`);
-  
-  // Initialize worker
-  initWorker(settings.forceWasm || false);
-});
-
+// 1. Initialize our background Inference Web Worker
 // 1. Initialize our background Inference Web Worker
 function initWorker(forceWasm) {
   worker = new Worker(new URL('worker.js', import.meta.url), { type: 'module' });
@@ -292,14 +279,31 @@ chrome.runtime.onMessage.addListener((message) => {
   if (message.target === 'offscreen') {
     switch (message.type) {
       case 'START_RECORDING':
+        // Dynamically accept settings passed by Background service worker
+        const settings = message.settings || {};
+        if (settings.rmsThreshold !== undefined) {
+          RMS_THRESHOLD = parseFloat(settings.rmsThreshold);
+        }
+        if (settings.silenceDuration !== undefined) {
+          SILENCE_DURATION_MS = parseInt(settings.silenceDuration);
+        }
+        console.log(`VAD Parameters Set: Threshold=${RMS_THRESHOLD}, SilenceMs=${SILENCE_DURATION_MS}`);
+        
+        // Spawn the worker thread only when recording starts
+        if (!worker) {
+          initWorker(settings.forceWasm || false);
+        }
         startRecording();
         break;
       case 'STOP_RECORDING':
         stopRecording();
         break;
       case 'TRIGGER_PRECACHE':
-        // Loading the worker triggers background caching automatically
-        console.log('Pre-cache triggered.');
+        // Spawn the worker in the background to pre-load and cache the model weights
+        if (!worker) {
+          initWorker(message.forceWasm || false);
+        }
+        console.log('Pre-cache warm up initiated.');
         break;
     }
   }

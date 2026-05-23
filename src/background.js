@@ -146,22 +146,35 @@ async function handleBackgroundMessages(message, sender, sendResponse) {
 
     // Handles when the offscreen document is ready and requesting active state
     case 'OFFSCREEN_READY':
-      // Offscreen signals it is initialized and ready
-      chrome.runtime.sendMessage({
-        target: 'offscreen',
-        type: 'START_RECORDING'
+      // Get settings from storage in the background service worker context
+      chrome.storage.local.get({
+        rmsThreshold: '0.015',
+        silenceDuration: '1500',
+        forceWasm: false
+      }, (settings) => {
+        // Send settings to offscreen along with start recording command
+        chrome.runtime.sendMessage({
+          target: 'offscreen',
+          type: 'START_RECORDING',
+          settings: settings
+        });
       });
       break;
 
     // If options page requests precaching
     case 'PRECACHE_MODEL':
       await ensureOffscreenDocument();
-      setTimeout(() => {
-        chrome.runtime.sendMessage({
-          target: 'offscreen',
-          type: 'TRIGGER_PRECACHE'
-        });
-      }, 1000);
+      chrome.storage.local.get({
+        forceWasm: false
+      }, (settings) => {
+        setTimeout(() => {
+          chrome.runtime.sendMessage({
+            target: 'offscreen',
+            type: 'TRIGGER_PRECACHE',
+            forceWasm: settings.forceWasm
+          });
+        }, 1000);
+      });
       break;
 
     default:
