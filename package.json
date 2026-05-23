@@ -1,0 +1,17 @@
+{
+  "name": "whisper-stt-extension",
+  "version": "1.0.0",
+  "description": "Continuous local Speech-to-Text browser extension using Moonshine Tiny and WebGPU",
+  "type": "module",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}

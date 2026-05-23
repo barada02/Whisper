@@ -1,0 +1,187 @@
+/* Glassmorphism dictation overlay injected into Shadow DOM */
+
+:host {
+  all: initial; /* Reset all styling inheritance from host page */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.whisper-overlay-container {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  pointer-events: none; /* Let clicks pass through to page */
+}
+
+/* Glassmorphic Floating Bubble */
+.whisper-bubble {
+  position: relative;
+  width: 320px;
+  min-height: 110px;
+  padding: 16px 20px;
+  border-radius: 24px;
+  box-sizing: border-box;
+  pointer-events: auto; /* Re-enable pointer events inside bubble */
+  
+  /* Glassmorphism base rules */
+  background: rgba(15, 10, 36, 0.7);
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  
+  /* High-end metallic border and inset shadows */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 10px 20px rgba(255, 255, 255, 0.02);
+
+  /* Hidden and scaled down initially */
+  opacity: 0;
+  transform: translate3d(0, 60px, 0) scale(0.92);
+  transition: 
+    opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+/* Swell and slide up transition */
+.whisper-bubble.visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* Glowing background ambient effect */
+.whisper-glow-bg {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(108, 92, 231, 0.08) 0%, transparent 60%);
+  z-index: 1;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.whisper-bubble.speaking .whisper-glow-bg {
+  background: radial-gradient(circle, rgba(0, 230, 118, 0.06) 0%, transparent 60%);
+}
+
+/* Header & Status Indicator */
+.whisper-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.whisper-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Pulse Dot */
+.whisper-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #6c5ce7; /* Indigo-purple */
+  box-shadow: 0 0 8px #6c5ce7;
+  transition: all 0.3s ease;
+}
+
+/* Pulsing Active State */
+.whisper-bubble.speaking .whisper-dot {
+  background-color: #00e676; /* Neon Green */
+  box-shadow: 0 0 12px #00e676;
+  animation: whisper-pulse-anim 1.5s infinite;
+}
+
+.whisper-status {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: rgba(255, 255, 255, 0.45);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease;
+}
+
+.whisper-bubble.speaking .whisper-status {
+  color: rgba(0, 230, 118, 0.85);
+}
+
+/* Canvas Waveform Container */
+.whisper-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  margin-bottom: 4px;
+}
+
+.whisper-waveform {
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: screen;
+  display: block;
+}
+
+/* Transcript Panel */
+.whisper-transcript-container {
+  position: relative;
+  z-index: 2;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+/* Scrollbar customization */
+.whisper-transcript-container::-webkit-scrollbar {
+  width: 4px;
+}
+.whisper-transcript-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.whisper-transcript-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.whisper-transcript {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  transition: color 0.2s ease;
+}
+
+/* Glowing text highlight inside transcription */
+.streaming-text {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+}
+
+/* Animation declarations */
+@keyframes whisper-pulse-anim {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.5;
+    box-shadow: 0 0 16px rgba(0, 230, 118, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Whisper STT - Onboarding & Settings</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <div class="glow-bg"></div>
+    <div class="container">
+      <header class="header">
+        <h1 class="title">Whisper STT</h1>
+        <p class="subtitle">On-Device Local Dictation Powered by Moonshine Tiny</p>
+      </header>
+
+      <div class="card glass">
+        <h2>🚀 Getting Started</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h3>Pin the Extension</h3>
+              <p>Click the Extensions puzzle icon <span class="badge">🧩</span> at the top-right of your browser and pin <strong>Whisper STT</strong> for instant toggling.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h3>Grant Microphone Access</h3>
+              <p>We process all voice records 100% locally on your computer. Enable microphone access below to start.</p>
+              <button id="mic-btn" class="btn">Grant Microphone Permission</button>
+              <div id="mic-status" class="status-msg hidden">
+                <span class="icon-check">✓</span> Permission Granted successfully!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card glass">
+        <h2>⚙️ Dictation Settings</h2>
+        <div class="settings">
+          <div class="setting-item">
+            <div class="setting-desc">
+              <h3>Force WebAssembly (WASM)</h3>
+              <p>Disable WebGPU hardware acceleration and force CPU inference (useful for virtual machines or driver issues).</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="wasm-toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-desc">
+              <h3>Voice Sensitivity (VAD Threshold)</h3>
+              <p>Adjust how loudly you need to speak to trigger transcription. Lower values are more sensitive.</p>
+            </div>
+            <div class="control">
+              <input type="range" id="sensitivity-slider" min="0.005" max="0.05" step="0.005" value="0.015">
+              <span id="sensitivity-val" class="val-label">0.015</span>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-desc">
+              <h3>Silence Pause Commit Delay</h3>
+              <p>The duration of silence (in seconds) required before text is automatically typed and committed.</p>
+            </div>
+            <div class="control">
+              <input type="range" id="delay-slider" min="0.8" max="3.0" step="0.1" value="1.5">
+              <span id="delay-val" class="val-label">1.5s</span>
+            </div>
+          </div>
+        </div>
+        <div class="save-bar">
+          <button id="save-btn" class="btn btn-save">Save Settings</button>
+          <span id="save-status" class="save-status hidden">Settings saved!</span>
+        </div>
+      </div>
+
+      <div class="card glass">
+        <h2>📦 Offline Model Pre-caching</h2>
+        <div class="caching-section">
+          <div class="caching-info">
+            <h3>Moonshine Tiny (50MB)</h3>
+            <p>The model downloads automatically. It is saved directly in your browser's persistent cache. We will begin caching immediately to ensure offline readiness.</p>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar-wrapper">
+              <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <span id="progress-text" class="progress-text">Model Ready (Pre-cached)</span>
+          </div>
+        </div>
+      </div>
+      
+      <footer class="footer">
+        <p>Your audio never leaves your device. Built with local privacy by Useful Sensors & Transformers.js.</p>
+      </footer>
+    </div>
+    <script src="options.js"></script>
+  </body>
+</html>
