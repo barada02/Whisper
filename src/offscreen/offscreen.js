@@ -1,11 +1,10 @@
 let audioContext = null;
 let mediaStream = null;
-let scriptProcessor = null;
+let workletNode = null;
 let worker = null;
 
 // Audio parameters
 const TARGET_SAMPLE_RATE = 16000;
-const BUFFER_SIZE = 4096;
 
 // Dictation state variables
 let accumulatedAudio = [];
@@ -17,7 +16,6 @@ let transcriptionInterval = null;
 let RMS_THRESHOLD = 0.015; // default energy threshold
 let SILENCE_DURATION_MS = 1500; // 1.5 seconds pause commits speech
 
-// 1. Initialize our background Inference Web Worker
 // 1. Initialize our background Inference Web Worker
 function initWorker(forceWasm) {
   worker = new Worker(new URL('worker.js', import.meta.url), { type: 'module' });
@@ -70,7 +68,7 @@ function handleWorkerMessages(message) {
   }
 }
 
-// 2. Microphone Capture & Resampling Pipeline
+// 2. Microphone Capture using AudioWorkletNode (replaces deprecated ScriptProcessorNode)
 async function startRecording() {
   if (audioContext) return;
 
@@ -85,23 +83,26 @@ async function startRecording() {
 
     console.log(`Microphone captured successfully. Input Sample Rate: ${inputSampleRate}Hz`);
 
-    // Create ScriptProcessor for PCM audio capture
-    scriptProcessor = audioContext.createScriptProcessor(BUFFER_SIZE, 1, 1);
-    
-    scriptProcessor.onaudioprocess = (e) => {
-      const inputData = e.inputBuffer.getChannelData(0);
-      
-      // Calculate Root Mean Square (RMS) for VAD
-      const rms = calculateRMS(inputData);
+    // Register the AudioWorklet processor module
+    await audioContext.audioWorklet.addModule('offscreen/audio-processor.js');
+
+    // Create AudioWorkletNode connected to our processor
+    workletNode = new AudioWorkletNode(audioContext, 'audio-capture-processor');
+
+    // Handle audio chunks from the worklet processor via MessagePort
+    workletNode.port.onmessage = (event) => {
+      const { audio, rms } = event.data;
       
       // Downsample input chunks to 16,000Hz (required by ASR model)
-      const resampledChunk = downsampleChunk(inputData, inputSampleRate, TARGET_SAMPLE_RATE);
+      const resampledChunk = downsampleChunk(audio, inputSampleRate, TARGET_SAMPLE_RATE);
       
       handleAudioProcessing(resampledChunk, rms);
     };
 
-    source.connect(scriptProcessor);
-    scriptProcessor.connect(audioContext.destination);
+    source.connect(workletNode);
+    // AudioWorkletNode doesn't need to connect to destination for capture-only use,
+    // but we connect to keep the audio graph alive
+    workletNode.connect(audioContext.destination);
 
     chrome.runtime.sendMessage({
       target: 'background',
@@ -117,14 +118,6 @@ async function startRecording() {
       error: 'Microphone permission denied.'
     });
   }
-}
-
-function calculateRMS(samples) {
-  let sum = 0;
-  for (let i = 0; i < samples.length; i++) {
-    sum += samples[i] * samples[i];
-  }
-  return Math.sqrt(sum / samples.length);
 }
 
 // Downsample array in real-time using averaging low-pass resampling
@@ -254,9 +247,9 @@ async function stopRecording() {
   stopStreamingTranscriptions();
   if (silenceTimer) clearTimeout(silenceTimer);
   
-  if (scriptProcessor) {
-    scriptProcessor.disconnect();
-    scriptProcessor = null;
+  if (workletNode) {
+    workletNode.disconnect();
+    workletNode = null;
   }
   
   if (audioContext) {

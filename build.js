@@ -66,6 +66,7 @@ async function runBuild() {
   // Copy CSS and HTML assets
   fs.copyFileSync(path.join(srcDir, 'content', 'content.css'), path.join(distDir, 'content', 'content.css'));
   fs.copyFileSync(path.join(srcDir, 'offscreen', 'offscreen.html'), path.join(distDir, 'offscreen', 'offscreen.html'));
+  fs.copyFileSync(path.join(srcDir, 'offscreen', 'audio-processor.js'), path.join(distDir, 'offscreen', 'audio-processor.js'));
   fs.copyFileSync(path.join(srcDir, 'options', 'options.html'), path.join(distDir, 'options', 'options.html'));
   fs.copyFileSync(path.join(srcDir, 'options', 'options.css'), path.join(distDir, 'options', 'options.css'));
 
