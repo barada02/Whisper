@@ -201,6 +201,7 @@ function insertTextAtCursor(element, text) {
 // Listen to Background Signals
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.target === 'content') {
+    console.log(`[Whisper Content] Received: ${message.type}`, message.text ? `text="${message.text}"` : '');
     ensureOverlayUI();
     handleBackgroundMessages(message);
   }

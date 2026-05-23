@@ -51,6 +51,7 @@ function handleWorkerMessages(message) {
 
     // Transcriber completed an inference slice
     case 'TRANSCRIPTION_RESULT':
+      console.log(`[Offscreen] TRANSCRIPTION_RESULT: isFinal=${message.isFinal}, text="${message.text}"`);
       if (message.isFinal) {
         chrome.runtime.sendMessage({
           target: 'background',
@@ -209,10 +210,15 @@ function stopStreamingTranscriptions() {
 }
 
 function triggerInference(isFinal) {
-  if (accumulatedAudio.length === 0) return;
+  if (accumulatedAudio.length === 0) {
+    console.log('[Offscreen] triggerInference called but audio buffer is empty');
+    return;
+  }
 
   // Clone current buffer
   const audioData = new Float32Array(accumulatedAudio);
+  const durationSec = (audioData.length / TARGET_SAMPLE_RATE).toFixed(2);
+  console.log(`[Offscreen] Sending ${audioData.length} samples (${durationSec}s) for inference. isFinal=${isFinal}`);
   
   // Post audio buffer to worker thread
   worker.postMessage({
