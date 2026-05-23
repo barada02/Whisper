@@ -9,7 +9,12 @@
     "storage"
   ],
   "action": {
-    "default_icon": "icons/icon32_inactive.png",
+    "default_icon": {
+      "16": "icons/icon16_inactive.png",
+      "32": "icons/icon32_inactive.png",
+      "48": "icons/icon48_inactive.png",
+      "128": "icons/icon128_inactive.png"
+    },
     "default_title": "Activate Voice Dictation"
   },
   "background": {
@@ -18,13 +23,8 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ],
-      "js": [
-        "content/content.js"
-      ],
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content/content.js"],
       "run_at": "document_end"
     }
   ],
@@ -36,9 +36,7 @@
         "transformers/*.mjs",
         "content/content.css"
       ],
-      "matches": [
-        "<all_urls>"
-      ]
+      "matches": ["<all_urls>"]
     }
   ]
 }

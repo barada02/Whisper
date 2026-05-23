@@ -47,9 +47,14 @@ async function updateExtensionUI(tabId) {
     ? 'Whisper STT - Continuous Dictation Active (Click to Stop)'
     : 'Whisper STT - Activate Continuous Dictation';
 
-  // Set action icon (passing a single path string allows Chrome to auto-scale and avoids strict dimension checks)
+  // Set action icon using standard Manifest V3 multi-resolution mapping
   await chrome.action.setIcon({
-    path: `icons/icon32_${state}.png`,
+    path: {
+      "16": `icons/icon16_${state}.png`,
+      "32": `icons/icon32_${state}.png`,
+      "48": `icons/icon48_${state}.png`,
+      "128": `icons/icon128_${state}.png`
+    },
     tabId: tabId
   });
 
