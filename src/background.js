@@ -123,28 +123,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 async function handleBackgroundMessages(message, sender, sendResponse) {
-  // Query active tab to route messages
-  const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!activeTab || !activeTab.id) return;
-
   switch (message.type) {
     // Forward Speech Events from Offscreen to injected Content Script
     case 'SPEECH_START':
     case 'SPEECH_TRANSCRIPT':
     case 'SPEECH_COMMIT':
     case 'SPEECH_SILENCE':
-    case 'MODEL_STATUS':
-      // Forward to content script on active tab
-      try {
-        await chrome.tabs.sendMessage(activeTab.id, {
-          target: 'content',
-          ...message
-        });
-      } catch (e) {
-        // Only log once to avoid console spam when content script isn't loaded
-        if (!handleBackgroundMessages._contentWarnLogged) {
-          console.warn('Content script not available on this tab. Speech events will be forwarded once a compatible page is active.');
-          handleBackgroundMessages._contentWarnLogged = true;
+    case 'MODEL_STATUS': {
+      // These messages need to be forwarded to the active tab's content script
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (activeTab && activeTab.id) {
+        try {
+          await chrome.tabs.sendMessage(activeTab.id, {
+            target: 'content',
+            ...message
+          });
+        } catch (e) {
+          // Only log once to avoid console spam when content script isn't loaded
+          if (!handleBackgroundMessages._contentWarnLogged) {
+            console.warn('Content script not available on this tab. Speech events will be forwarded once a compatible page is active.');
+            handleBackgroundMessages._contentWarnLogged = true;
+          }
         }
       }
       // Also broadcast MODEL_STATUS via runtime so the options/setup page can receive it
@@ -156,6 +155,7 @@ async function handleBackgroundMessages(message, sender, sendResponse) {
         }
       }
       break;
+    }
 
     // Handles when the offscreen document is ready and requesting active state
     case 'OFFSCREEN_READY':

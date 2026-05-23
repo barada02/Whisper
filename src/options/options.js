@@ -161,6 +161,13 @@ step2Next.addEventListener('click', () => {
 function markSetupComplete() {
   chrome.storage.local.set({ setupComplete: true });
 
+  // Mark step 3 as completed in the wizard indicator
+  const step3Dot = document.querySelector('.wizard-step[data-step="3"]');
+  if (step3Dot) {
+    step3Dot.classList.remove('active');
+    step3Dot.classList.add('completed');
+  }
+
   // Show completion badge after a short delay for dramatic effect
   setTimeout(() => {
     setupCompleteBadge.classList.remove('hidden');

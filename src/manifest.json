@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Whisper STT - Moonshine Dictation",
-  "version": "2.9.0",
+  "version": "3.2.0",
   "description": "Premium, continuous on-device local Speech-to-Text using Moonshine Tiny and WebGPU.",
   "permissions": [
     "activeTab",
